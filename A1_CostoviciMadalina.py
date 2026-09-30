@@ -69,7 +69,7 @@ def buildRadarPlot(year, deathsInYear, meanTempInYear, mortRefInYear, tempRefInY
     label_loc = np.linspace(0, 2 * np.pi, num = len(segments))
 
     plt.style.use('dark_background')
-    fig, ax = plt.subplots(figsize = (10, 10), subplot_kw = dict(polar = True))
+    fig, ax = plt.subplots(figsize = (9.5, 9.5), subplot_kw = dict(polar = True))
     ax.set_facecolor('#212946')
     fig.patch.set_facecolor('#181C2B')
 
