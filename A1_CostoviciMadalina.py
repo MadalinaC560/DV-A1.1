@@ -57,8 +57,8 @@ def buildRadarPlot(year, deathsInYear, meanTempInYear, mortRefInYear, tempRefInY
     tempRefInYear = extractTempReffromYear(year)
 
     # Scaling the meanTemp and tempRef to match scale of deaths and mortRef for better visualization
-    meanTempInYear = [t * 30 for t in meanTempInYear]
-    tempRefInYear = [t * 30 for t in tempRefInYear]
+    meanTempInYear = [t * 10 for t in meanTempInYear]
+    tempRefInYear = [t * 10 for t in tempRefInYear]
 
     deathsInYear = appendElementToEndOfList(deathsInYear)
     meanTempInYear = appendElementToEndOfList(meanTempInYear)
@@ -93,7 +93,56 @@ def buildRadarPlot(year, deathsInYear, meanTempInYear, mortRefInYear, tempRefInY
     plt.title(str(year), size = 20, color = "white", y = 1.1)
     plt.show()
 
+# Building radar plots for each year from 1840 to 1850
 for m in range(0, 11):
     buildRadarPlot(yearStart, deaths, meanTemp, mortRef, tempRef, chartSegments)
     yearStart += 1
     m += 1
+
+# Getting the average deaths, temperature, mortality reference, and temperature references across all years
+avgData = data.groupby('week').mean(numeric_only=True).reset_index()
+
+# Extracting the average values into lists for plotting
+avgDeaths = avgData["deaths"].tolist()
+avgMeanTemp = avgData["mean_temperature"].tolist()
+avgMortRef = avgData["mortality_reference"].tolist()
+avgTempRef = avgData["temperature_reference"].tolist()
+
+avgMeanTemp = [t * 10 for t in avgMeanTemp] # Scaling the average mean temperature to match the scale of deaths and mortality reference for better visualization
+avgTempRef = [t * 10 for t in avgTempRef] # Scaling the average temperature reference to match the scale of deaths and mortality reference for better visualization
+
+# Appending the first element to the end of each list to create closed radar plots
+avgDeaths = appendElementToEndOfList(avgDeaths)
+avgMeanTemp = appendElementToEndOfList(avgMeanTemp)
+avgMortRef = appendElementToEndOfList(avgMortRef)
+avgTempRef = appendElementToEndOfList(avgTempRef)
+
+avgSegments = chartSegments # Copying list to avoid modifying the original chartSegments list
+avgSegments = appendElementToEndOfList(avgSegments)  # Append the first segment to the end for closure
+
+# Building a radar plot for the average values across all years
+label_loc = np.linspace(0, 2 * np.pi, num = len(avgSegments))
+
+plt.style.use('dark_background')
+fig, ax = plt.subplots(figsize = (9.5, 9.5), subplot_kw = dict(polar = True))
+ax.set_facecolor('#212946')
+fig.patch.set_facecolor('#181C2B')
+
+ax.plot(label_loc, avgDeaths, label = "AverageDeaths", color = "deeppink", linewidth = 1, marker = 'o', markersize = 2)
+ax.plot(label_loc, avgMeanTemp, label = "AverageMeanTemp", color = "deepskyblue", linewidth = 1, marker = 'o', markersize = 2)
+ax.plot(label_loc, avgMortRef, label = "AverageMortRef", color = "limegreen", linewidth = 1, marker = 'o', markersize = 2)
+ax.plot(label_loc, avgTempRef, label = "AverageTempRef", color = "orange", linewidth = 1, marker = 'o', markersize = 2)
+
+ax.fill(label_loc, avgDeaths, color="deeppink", alpha=0.12)
+ax.fill(label_loc, avgMeanTemp, color="deepskyblue", alpha=0.12)
+ax.fill(label_loc, avgMortRef, color="limegreen", alpha=0.12)
+ax.fill(label_loc, avgTempRef, color="orange", alpha=0.12)
+
+lines, labels = plt.thetagrids(np.degrees(label_loc), labels = avgSegments)
+ax.grid(color='#2A3459', linestyle='--', linewidth=0.8)
+
+legend = plt.legend(loc = "upper right", bbox_to_anchor=(1.1, 1.1), framealpha = 1, facecolor ='#181C2B', edgecolor = 'none')
+plt.setp(legend.get_texts(), color='w')
+    
+plt.title("1840 - 1850", size = 20, color = "white", y = 1.1)
+plt.show()
